@@ -70,7 +70,12 @@ MuonShowerInformationFiller::MuonShowerInformationFiller(const edm::ParameterSet
       theDTRecHitLabel(par.getParameter<InputTag>("DTRecSegmentLabel")),
       theCSCRecHitLabel(par.getParameter<InputTag>("CSCRecSegmentLabel")),
       theCSCSegmentsLabel(par.getParameter<InputTag>("CSCSegmentLabel")),
-      theDT4DRecSegmentLabel(par.getParameter<InputTag>("DT4DRecSegmentLabel")) {
+      theDT4DRecSegmentLabel(par.getParameter<InputTag>("DT4DRecSegmentLabel")),
+      trackerToken(iC.esConsumes<edm::Transition::BeginRun>()),
+      geomTrackingToken(iC.esConsumes<edm::Transition::BeginRun>()),
+      fieldToken(iC.esConsumes<edm::Transition::BeginRun>()),
+      geomCSCToken(iC.esConsumes<edm::Transition::BeginRun>()),
+      geomDTToken(iC.esConsumes<edm::Transition::BeginRun>()) {
   theDTRecHitToken = iC.consumes<DTRecHitCollection>(theDTRecHitLabel);
   theCSCRecHitToken = iC.consumes<CSCRecHit2DCollection>(theCSCRecHitLabel);
   theCSCSegmentsToken = iC.consumes<CSCSegmentCollection>(theCSCSegmentsLabel);
@@ -80,7 +85,9 @@ MuonShowerInformationFiller::MuonShowerInformationFiller(const edm::ParameterSet
   theService = new MuonServiceProxy(serviceParameters, edm::ConsumesCollector(iC));
 
   theTrackerRecHitBuilderName = par.getParameter<string>("TrackerRecHitBuilder");
+  trackerRecHitBuilderToken = iC.esConsumes(edm::ESInputTag("", theTrackerRecHitBuilderName));
   theMuonRecHitBuilderName = par.getParameter<string>("MuonRecHitBuilder");
+  muonRecHitBuilderToken = iC.esConsumes(edm::ESInputTag("", theMuonRecHitBuilderName));
 
   theCacheId_TRH = 0;
   theCacheId_MT = 0;
@@ -153,17 +160,17 @@ void MuonShowerInformationFiller::setEvent(const edm::Event& event) {
 //
 void MuonShowerInformationFiller::setServices(const EventSetup& setup) {
   // DetLayer Geometry
-  setup.get<GlobalTrackingGeometryRecord>().get(theTrackingGeometry);
-  setup.get<IdealMagneticFieldRecord>().get(theField);
-  setup.get<TrackerRecoGeometryRecord>().get(theTracker);
-  setup.get<MuonGeometryRecord>().get(theCSCGeometry);
-  setup.get<MuonGeometryRecord>().get(theDTGeometry);
+  theTracker = setup.getHandle(trackerToken);
+  theTrackingGeometry = setup.getHandle(geomTrackingToken);
+  theField = setup.getHandle(fieldToken);
+  theCSCGeometry = setup.getHandle(geomCSCToken);
+  theDTGeometry = setup.getHandle(geomDTToken);
 
   // Transient Rechit Builders
   unsigned long long newCacheId_TRH = setup.get<TransientRecHitRecord>().cacheIdentifier();
   if (newCacheId_TRH != theCacheId_TRH) {
-    setup.get<TransientRecHitRecord>().get(theTrackerRecHitBuilderName, theTrackerRecHitBuilder);
-    setup.get<TransientRecHitRecord>().get(theMuonRecHitBuilderName, theMuonRecHitBuilder);
+    theTrackerRecHitBuilder = setup.getHandle(trackerRecHitBuilderToken);
+    theMuonRecHitBuilder = setup.getHandle(muonRecHitBuilderToken);
   }
 }
 

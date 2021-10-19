@@ -32,6 +32,13 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+
+#include "RecoTracker/Record/interface/TrackerRecoGeometryRecord.h"
+#include "TrackingTools/Records/interface/TransientRecHitRecord.h"
+
+#include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
+#include "Geometry/Records/interface/MuonGeometryRecord.h"
 #include "Geometry/DTGeometry/interface/DTGeometry.h"
 #include "Geometry/CSCGeometry/interface/CSCGeometry.h"
 
@@ -187,9 +194,11 @@ private:
 
   std::string theTrackerRecHitBuilderName;
   edm::ESHandle<TransientTrackingRecHitBuilder> theTrackerRecHitBuilder;
+  edm::ESGetToken<TransientTrackingRecHitBuilder, TransientRecHitRecord> trackerRecHitBuilderToken;
 
   std::string theMuonRecHitBuilderName;
   edm::ESHandle<TransientTrackingRecHitBuilder> theMuonRecHitBuilder;
+  edm::ESGetToken<TransientTrackingRecHitBuilder, TransientRecHitRecord> muonRecHitBuilderToken;
 
   edm::InputTag theDTRecHitLabel;
   edm::InputTag theCSCRecHitLabel;
@@ -212,5 +221,12 @@ private:
   edm::ESHandle<MagneticField> theField;
   edm::ESHandle<CSCGeometry> theCSCGeometry;
   edm::ESHandle<DTGeometry> theDTGeometry;
+
+  edm::ESGetToken<GeometricSearchTracker, TrackerRecoGeometryRecord> trackerToken;
+  edm::ESGetToken<GlobalTrackingGeometry, GlobalTrackingGeometryRecord> geomTrackingToken;
+  edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> fieldToken;
+  edm::ESGetToken<CSCGeometry, MuonGeometryRecord> geomCSCToken;
+  edm::ESGetToken<DTGeometry, MuonGeometryRecord> geomDTToken;
+
 };
 #endif
