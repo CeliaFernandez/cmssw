@@ -30,6 +30,7 @@
 
 #include "RecoMuon/MuonIdentification/interface/MuonMesh.h"
 #include "RecoMuon/MuonIdentification/interface/MuonKinkFinder.h"
+using namespace std;
 
 MuonIdProducer::MuonIdProducer(const edm::ParameterSet& iConfig)
     : geomTokenRun_(esConsumes<edm::Transition::BeginRun>()),
@@ -435,11 +436,121 @@ bool validateGlobalMuonPair(const reco::MuonTrackLinks& goodMuon, const reco::Mu
   return (nHitsGood >= nHitsBad);
 }
 
+
+int MuonIdProducer::sharedHits(const reco::Track& track1, const reco::Track& track2) const {
+
+  int match = 0;
+
+  cout << "Number of RecHits Track1: " << track1.recHitsSize() << endl;
+  cout << "Number of RecHits Track2: " << track2.recHitsSize() << endl;
+
+
+  for (trackingRecHit_iterator hit1 = track1.recHitsBegin(); hit1 != track1.recHitsEnd(); ++hit1) {
+    if ( !(*hit1)->isValid() ) continue;
+    DetId id1 = (*hit1)->geographicalId();
+
+
+   for (trackingRecHit_iterator hit2 = track2.recHitsBegin(); hit2 != track2.recHitsEnd(); ++hit2) {
+      if ( !(*hit2)->isValid() ) continue;
+      DetId id2 = (*hit2)->geographicalId();
+
+      if (id2.subdetId() != id1.subdetId()) continue;
+      if (id2.rawId() != id1.rawId() ) continue;
+
+      match++;
+
+      }
+
+
+  }
+
+  return match;
+
+}
+
+
+
+float MuonIdProducer::frac_sharedHitsPixel(const reco::Track& track1, const reco::Track& track2) const {
+
+  float match = 0;
+  int NumOfflinePixel=0;
+  int NumMatchedPixel=0;
+
+  for (trackingRecHit_iterator hit1 = track1.recHitsBegin(); hit1 != track1.recHitsEnd(); ++hit1) {
+    if ( !(*hit1)->isValid() ) continue;
+    DetId id1 = (*hit1)->geographicalId();
+
+    int subdetId=id1.subdetId();
+    bool pass=false;
+    if(subdetId == 1 || subdetId == 2 ) pass=true;
+    if(pass==false)continue;
+
+
+    NumOfflinePixel++;
+    for (trackingRecHit_iterator hit2 = track2.recHitsBegin(); hit2 != track2.recHitsEnd(); ++hit2) {
+      if ( !(*hit2)->isValid() ) continue;
+      DetId id2 = (*hit2)->geographicalId();
+
+
+      if (id2.subdetId() != id1.subdetId()) continue;
+
+
+      if (id2.rawId() != id1.rawId() ) continue;
+
+      NumMatchedPixel++;
+
+    }
+  }
+
+
+  match=float(NumMatchedPixel)/float(NumOfflinePixel);
+
+
+  return match;
+
+}
+
+
+
 void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto outputMuons = std::make_unique<reco::MuonCollection>();
   auto caloMuons = std::make_unique<reco::CaloMuonCollection>();
 
   init(iEvent, iSetup);
+
+
+
+   for ( unsigned int i = 0; i < inputCollectionLabels_.size(); ++i ) {
+      const auto& inputLabel = inputCollectionLabels_[i];
+      const auto inputType = inputCollectionTypes_[i];
+      if ( inputType == ICTypes::INNER_TRACKS ) {
+         iEvent.getByToken(innerTrackCollectionToken_, innerTrackCollectionHandle_);
+         if (! innerTrackCollectionHandle_.isValid())
+            throw cms::Exception("FatalError") << "Failed to get input track collection with label: " << inputLabel;
+         cout<< "Number of input inner tracks: " << innerTrackCollectionHandle_->size();
+
+       for(reco::TrackCollection::const_iterator itTracki = innerTrackCollectionHandle_->begin();
+        itTracki != innerTrackCollectionHandle_->end();
+        ++itTracki) {
+
+         cout<< "Pt of input inner tracksi: " << itTracki->pt();
+
+        for(reco::TrackCollection::const_iterator itTrackj = innerTrackCollectionHandle_->begin();
+        itTrackj != innerTrackCollectionHandle_->end();
+        ++itTrackj) {
+
+        cout<< "Pt of input inner tracksj: " << itTrackj->pt();
+
+        int sharedhits = sharedHits(*itTracki,*itTrackj);
+        //int sharedhits = sharedHits(*itTracki,*itTracki); //For Same Tracks
+        std::cout<<"SharedHits:"<<sharedhits<<std::endl;
+
+        }
+
+                }
+        }
+        }
+
 
   if (fillShowerDigis_ && fillMatching_)
     theShowerDigiFiller_->getDigis(iEvent);

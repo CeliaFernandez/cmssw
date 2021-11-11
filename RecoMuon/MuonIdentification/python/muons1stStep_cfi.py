@@ -32,17 +32,21 @@ muons1stStep = cms.EDProducer("MuonIdProducer",
     inputCollectionTypes = cms.vstring('inner tracks', 
                                        'links', 
                                        'outer tracks',
-                                       'tev firstHit',
-                                       'tev picky',
-                                       'tev dyt'),
+                                       #'tev firstHit',
+                                       #'tev picky',
+                                       #'tev dyt'
+					),
     addExtraSoftMuons = cms.bool(False),
     fillGlobalTrackRefits = cms.bool(True),
 
     # internal
     debugWithTruthMatching = cms.bool(False),
     # input tracks
-    inputCollectionLabels = cms.VInputTag(cms.InputTag("generalTracks"), cms.InputTag("globalMuons"), cms.InputTag("standAloneMuons","UpdatedAtVtx"),
-                                          cms.InputTag("tevMuons","firstHit"),cms.InputTag("tevMuons","picky"),cms.InputTag("tevMuons","dyt")),
+    #inputCollectionLabels = cms.VInputTag(cms.InputTag("generalTracks"), cms.InputTag("globalMuons"), cms.InputTag("standAloneMuons","UpdatedAtVtx"),
+    #                                      cms.InputTag("tevMuons","firstHit"),cms.InputTag("tevMuons","picky"),cms.InputTag("tevMuons","dyt")),
+
+    inputCollectionLabels = cms.VInputTag(cms.InputTag("generalTracks"), cms.InputTag("globalMuons"), cms.InputTag("standAloneMuons","UpdatedAtVtx")),
+
     fillCaloCompatibility = cms.bool(True),
     # OR
     maxAbsPullY = cms.double(9999.0),
