@@ -12,14 +12,14 @@ displacedMuons = cms.EDProducer("MuonProducer",
 
                        FillTimingInfo = cms.bool(True),
                        
-                       FillDetectorBasedIsolation = cms.bool(True),
+                       FillDetectorBasedIsolation = cms.bool(False),
                        EcalIsoDeposits  = cms.InputTag("muIsoDepositCalByAssociatorTowers","ecal"),
                        HcalIsoDeposits  = cms.InputTag("muIsoDepositCalByAssociatorTowers","hcal"),
                        HoIsoDeposits    = cms.InputTag("muIsoDepositCalByAssociatorTowers","ho"),
                        TrackIsoDeposits = cms.InputTag("muIsoDepositTk"),
                        JetIsoDeposits   = cms.InputTag("muIsoDepositJets"),
 
-                       FillPFIsolation = cms.bool(True),                     
+                       FillPFIsolation = cms.bool(False),                     
                        PFIsolation = cms.PSet(
                         pfIsolationR03 = cms.PSet(chargedParticle            = cms.InputTag("muPFIsoValueChargedAll03"),
                                                   chargedHadron              = cms.InputTag("muPFIsoValueCharged03"),
@@ -65,7 +65,7 @@ displacedMuons = cms.EDProducer("MuonProducer",
                                                   pu                         = cms.InputTag("muPFSumDRIsoValuePU04"))
                        ),
 
-                       FillSelectorMaps = cms.bool(True),
+                       FillSelectorMaps = cms.bool(False),
                        SelectorMaps = cms.VInputTag(cms.InputTag("muidTMLastStationOptimizedLowPtLoose"),
                                                     cms.InputTag("muidTMLastStationOptimizedLowPtTight"),
                                                     cms.InputTag("muidTM2DCompatibilityLoose"),
@@ -87,10 +87,10 @@ displacedMuons = cms.EDProducer("MuonProducer",
                                                     cms.InputTag("muidRPCMuLoose")
                                                     ),
 
-                       FillShoweringInfo = cms.bool(True),
+                       FillShoweringInfo = cms.bool(False),
                        ShowerInfoMap = cms.InputTag("muonShowerInformation"),
 
-                       FillCosmicsIdMap = cms.bool(True),
+                       FillCosmicsIdMap = cms.bool(False),
                        CosmicIdMap = cms.InputTag("cosmicsVeto"),
 
                        ComputeStandardSelectors = cms.bool(True),

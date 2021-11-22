@@ -165,9 +165,11 @@ MuonIdProducer::MuonIdProducer(const edm::ParameterSet& iConfig)
   rpcHitToken_ = consumes<RPCRecHitCollection>(rpcHitTag);
 
   //Consumes... UGH
+  std::cout << "CollectionLabelsSize:" << inputCollectionLabels_.size() << std::endl;
   inputCollectionTypes_.resize(inputCollectionLabels_.size());
   for (unsigned int i = 0; i < inputCollectionLabels_.size(); ++i) {
     const auto inputLabel = inputCollectionLabels_[i];
+    std::cout << inputCollectionLabels_[i] << std::endl;
     const auto inputType = ICTypes::toKey(inputCollectionTypes[i]);  // Note: thorws exception if type is undefined.
 
     if (inputType == ICTypes::INNER_TRACKS) {
@@ -518,8 +520,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
   init(iEvent, iSetup);
 
-
-
+   /*
    for ( unsigned int i = 0; i < inputCollectionLabels_.size(); ++i ) {
       const auto& inputLabel = inputCollectionLabels_[i];
       const auto inputType = inputCollectionTypes_[i];
@@ -550,7 +551,7 @@ void MuonIdProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
                 }
         }
         }
-
+  */
 
   if (fillShowerDigis_ && fillMatching_)
     theShowerDigiFiller_->getDigis(iEvent);

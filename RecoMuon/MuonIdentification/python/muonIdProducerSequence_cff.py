@@ -10,18 +10,13 @@ from TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cf
 # add TrackDetectorAssociator lookup maps to the EventSetup
 from TrackingTools.TrackAssociator.DetIdAssociatorESProducer_cff import *
 from RecoMuon.MuonIdentification.isolation_cff import *
-
 from RecoMuon.MuonIdentification.muons1stStep_cfi import *
-
-from RecoMuon.MuonIdentification.displacedMuons1stStep_cfi import * 
-
+#from RecoMuon.MuonIdentification.displacedMuons1stStep_cfi import * 
 from RecoMuon.MuonIdentification.muonTiming_cfi import *
 # Glb Track Quality
 from RecoMuon.GlobalTrackingTools.GlobalTrackQuality_cfi import *
 
 muons1stStep.fillGlobalTrackQuality = True
-
-displacedMuons1stStep.fillGlobalTrackQuality = True 
 
 from RecoMuon.MuonIdentification.cosmics_id import *
 
@@ -29,6 +24,10 @@ from RecoMuon.MuonIdentification.muonShowerInformationProducer_cff import *
 
 muonIdProducerTask = cms.Task(glbTrackQual,muons1stStep,muonEcalDetIds,muonShowerInformation)
 
-displacedMuonIdProducerTask = cms.Task(displacedMuons1stStep,muonEcalDetIds,muonShowerInformation) 
+#displacedMuonIdProducerTask = cms.Task(displacedMuons1stStep,muonEcalDetIds,muonShowerInformation) 
+#displacedMuons1stStep.fillGlobalTrackQuality = False 
 
-muonIdProducerSequence = cms.Sequence(muonIdProducerTask,displacedMuonIdProducerTask)
+#displacedMuonIdProducerTask = cms.Task(displacedMuons1stStep) 
+
+muonIdProducerSequence = cms.Sequence(muonIdProducerTask)
+#muonIdProducerSequence = cms.Sequence(muonIdProducerTask,displacedMuonIdProducerTask)

@@ -31,19 +31,13 @@ displacedMuons1stStep = cms.EDProducer("MuonIdProducer",
     minPt = cms.double(0.5),
     inputCollectionTypes = cms.vstring('inner tracks', 
                                        'links', 
-                                       'outer tracks',
-                                       #'tev firstHit',
-                                       #'tev picky',
-                                       #'tev dyt'
-					),
+                                       'outer tracks'),
     addExtraSoftMuons = cms.bool(False),
     fillGlobalTrackRefits = cms.bool(True),
 
     # internal
     debugWithTruthMatching = cms.bool(False),
     # input tracks
-    #inputCollectionLabels = cms.VInputTag(cms.InputTag("generalTracks"), cms.InputTag("globalMuons"), cms.InputTag("standAloneMuons","UpdatedAtVtx"),
-    #                                      cms.InputTag("tevMuons","firstHit"),cms.InputTag("tevMuons","picky"),cms.InputTag("tevMuons","dyt")),
 
     inputCollectionLabels = cms.VInputTag(cms.InputTag("displacedTracks"), cms.InputTag("displacedGlobalMuons"), cms.InputTag("displacedStandAloneMuons")),
 

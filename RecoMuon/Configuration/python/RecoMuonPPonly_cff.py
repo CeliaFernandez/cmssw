@@ -38,10 +38,17 @@ from RecoMuon.Configuration.SETRecoMuon_cff import *
 
 # Muon Id producer
 from RecoMuon.MuonIdentification.muonIdProducerSequence_cff import *
-
 muons1stStep.fillGlobalTrackQuality = True
 
-displacedMuons1stStep.fillGlobalTrackQuality = True 
+displacedMuons1stStep = muons1stStep.clone(
+    inputCollectionLabels = ['displacedTracks',
+                             'displacedGlobalMuons',
+                             'displacedStandAloneMuons'],
+    inputCollectionTypes = ['inner tracks',
+                            'links',
+                            'outer tracks'],
+    fillGlobalTrackQuality = False
+)
 
 #Muon Id isGood flag ValueMap producer sequence
 from RecoMuon.MuonIdentification.muonSelectionTypeValueMapProducer_cff import *
@@ -73,6 +80,7 @@ fastSim.toReplaceWith(globalmuontrackingTask,globalmuontrackingTask.copyAndExclu
 muontrackingTask = cms.Task(standalonemuontrackingTask,globalmuontrackingTask)
 muontracking = cms.Sequence(muontrackingTask)
 # Muon Reconstruction
+displacedMuonIdProducerTask = cms.Task(displacedMuons1stStep,muonEcalDetIds,muonShowerInformation)
 muonrecoTask = cms.Task(muontrackingTask,muonIdProducerTask,displacedMuonIdProducerTask)
 muonreco = cms.Sequence(muonrecoTask)
 # Muon Reconstruction plus Isolation
