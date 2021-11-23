@@ -179,7 +179,6 @@ MuonProducer::~MuonProducer() {
 /// reconstruct muons
 void MuonProducer::produce(edm::Event& event, const edm::EventSetup& eventSetup) {
   const std::string metname = "Muon|RecoMuon|MuonIdentification|MuonProducer";
-  std::cout << theMuonsCollectionLabel << std::endl;
 
   // the muon collection, it will be loaded in the event
   auto outputMuons = std::make_unique<reco::MuonCollection>();
@@ -354,7 +353,6 @@ void MuonProducer::produce(edm::Event& event, const edm::EventSetup& eventSetup)
   reco::MuonRef::key_type muIndex = 0;
   unsigned int i = 0;
   for (auto const& inMuon : *inputMuons) {
-    std::cout << "Muon: " << i << std::endl;
     reco::MuonRef muRef(inputMuons, muIndex);
     muonRefColl[i] = reco::MuonRef(outputMuonsRefProd, muIndex++);
 
@@ -427,7 +425,6 @@ void MuonProducer::produce(edm::Event& event, const edm::EventSetup& eventSetup)
     }
 
     // Standard Selectors - keep it at the end so that all inputs are available
-    std::cout << "computeStandardSelectors_: "<< computeStandardSelectors_ << std::endl;
     if (computeStandardSelectors_) {
       outMuon.setSelectors(0);  // reset flags
       bool isRun2016BCDEF = (272728 <= event.run() && event.run() <= 278808);
@@ -437,7 +434,6 @@ void MuonProducer::produce(edm::Event& event, const edm::EventSetup& eventSetup)
     outputMuons->push_back(outMuon);
     ++i;
   }
-  std::cout << "Finished loop" << std::endl;
 
   dout << "Number of Muons in the new muon collection: " << outputMuons->size() << endl;
   edm::OrphanHandle<reco::MuonCollection> muonHandle = event.put(std::move(outputMuons));

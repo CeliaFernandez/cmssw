@@ -97,11 +97,6 @@ private:
   void fillTrackerKink(reco::Muon& aMuon);
   void init(edm::Event&, const edm::EventSetup&);
 
-  int sharedHits(const reco::Track& track1, const reco::Track& track2) const;
-
-  float frac_sharedHitsPixel(const reco::Track& track1, const reco::Track& track2) const;
-
-
   // make a muon based on a track ref
   reco::Muon makeMuon(edm::Event& iEvent, const edm::EventSetup& iSetup, const reco::TrackRef& track, TrackType type);
   // make a global muon based on the links object
