@@ -95,6 +95,8 @@ MicroEventContent = cms.PSet(
         # patLowPtElectrons
         'keep *_slimmedLowPtElectrons_*_*',
         'keep *_gsfTracksOpenConversions_*_*',
+        # patDisplacedMuons
+        'keep *_slimmedDisplacedMuons_*_*',
     )
 )
 
