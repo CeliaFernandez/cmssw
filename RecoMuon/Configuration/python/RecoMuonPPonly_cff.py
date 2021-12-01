@@ -103,7 +103,8 @@ muonGlobalRecoTask = cms.Task(globalmuontrackingTask,
                               muonIdProducerTask,
 			      displacedMuonIdProducerTask,
                               muonSelectionTypeTask,
-                              muIsolationTask)
+                              muIsolationTask,
+                              muIsolationDisplacedTask)
 muonGlobalReco = cms.Sequence(muonGlobalRecoTask)
 
 # ... instead, the sequences will be run in the following order:
