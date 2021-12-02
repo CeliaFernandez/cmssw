@@ -38,6 +38,9 @@ RecoMuonAOD = cms.PSet(
                                            #'drop doubleedmValueMap_muons_muPFIso*_*', #already inside the muon
                                            # Tracks known by the Muon obj
                                            'keep recoMuons_displacedMuons_*_*',
+                                           'keep doubleedmValueMap_displacedMuons_dispMuPFMean*_*',
+                                           'keep doubleedmValueMap_displacedMuons_dispMuPFSum*_*',
+                                           'keep *_particleFlow_displacedMuons_*',
                                            'keep recoIsoDepositedmValueMap_*Displaced_*_*',
                                            'keep recoTracks_standAloneMuons_*_*',
                                            'keep recoTrackExtras_standAloneMuons_*_*',
