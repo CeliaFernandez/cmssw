@@ -29,7 +29,7 @@ patDisplacedMuons = patMuons.clone(
     embedTcMETMuonCorrs   = cms.bool(False), # removed from RECO/AOD!
 
     # Read and store combined inverse beta
-    addInverseBeta    = cms.bool(False),
+    addInverseBeta    = cms.bool(True),
     sourceMuonTimeExtra = cms.InputTag("displacedMuons","combined"), #Use combined info, not only csc or dt (need to check if this is 'on' for displaced)
 
     # mc matching (deactivated)

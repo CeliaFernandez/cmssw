@@ -16,6 +16,6 @@ slimmedDisplacedMuons = cms.EDProducer("PATMuonSlimmer",
     saveSegments = cms.bool(True),
     modifyMuons = cms.bool(True),
     modifierConfig = cms.PSet( modifications = cms.VPSet() ),
-    trackExtraAssocs = cms.VInputTag([]), # OJO need to add this
+    trackExtraAssocs = cms.VInputTag(["displacedMuonReducedTrackExtras", "slimmedDisplacedMuonTrackExtras"]), 
 )
 
