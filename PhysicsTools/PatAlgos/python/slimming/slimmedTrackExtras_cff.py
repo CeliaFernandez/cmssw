@@ -10,7 +10,7 @@ slimmedMuonTrackExtras = muonReducedTrackExtras.clone(muonTag = "selectedPatMuon
                                                                 stripClusterTag = "muonReducedTrackExtras")
 
 from RecoMuon.MuonIdentification.displacedMuonReducedTrackExtras_cfi import displacedMuonReducedTrackExtras
-slimmedDisplacedMuonTrackExtras = displacedMuonReducedTrackExtras.clone(muonTag = "selectedPatMuons",
+slimmedDisplacedMuonTrackExtras = displacedMuonReducedTrackExtras.clone(muonTag = "selectedPatDisplacedMuons",
                                                                 cut = "pt > 4.5",
                                                                 trackExtraTags = ["displacedMuonReducedTrackExtras", "displacedStandAloneMuons"],
                                                                 trackExtraAssocs = ["displacedMuonReducedTrackExtras"],
