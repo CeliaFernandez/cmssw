@@ -39,6 +39,8 @@
 #include "DataFormats/CSCRecHit/interface/CSCSegmentCollection.h"
 #include "DataFormats/GEMRecHit/interface/GEMSegmentCollection.h"
 #include "DataFormats/GEMRecHit/interface/ME0SegmentCollection.h"
+#include "DataFormats/RPCRecHit/interface/RPCRecHitCollection.h"
+#include "DataFormats/GEMRecHit/interface/GEMRecHitCollection.h"
 
 // calorimeter and muon infos
 #include "Geometry/CommonDetUnit/interface/GeomDet.h"
@@ -710,6 +712,42 @@ void TrackDetectorAssociator::fillMuon(const edm::Event& iEvent,
   edm::Handle<ME0SegmentCollection> me0Segments;
   if (parameters.useME0)
     iEvent.getByToken(parameters.me0SegmentsToken, me0Segments);
+
+  // Get the hits from the event
+  // (for now, they are also used to count the activity in muon chambers)
+  edm::Handle<RPCRecHitCollection> rpcRecHits;
+  iEvent.getByToken(parameters.rpcHitsToken, rpcRecHits);
+  if (!rpcRecHits.isValid())
+    throw cms::Exception("FatalError") << "Unable to find RPCRecHitCollection in event!\n";
+
+  edm::Handle<GEMRecHitCollection> gemRecHits;
+  if (parameters.useGEM)
+    iEvent.getByToken(parameters.gemHitsToken, gemRecHits);
+
+  edm::Handle<ME0RecHitCollection> me0RecHits;
+  if (parameters.useME0)
+    iEvent.getByToken(parameters.me0HitsToken, me0RecHits);
+
+
+  ///// Count the number of segments + hits in event
+
+  // Check if there are segments/hits in the event that could
+  // be potentially matched to a tracker muon.
+  // If there are none, stop the track extrapolation to muon system 
+
+  int totalNumberOfSegments = dtSegments->size() + cscSegments->size();
+  int totalNumberOfHits = rpcRecHits->size();
+  if (parameters.useGEM) {
+    totalNumberOfSegments += gemSegments->size();
+    totalNumberOfHits += gemRecHits->size();
+  }
+  if (parameters.useME0) {
+    totalNumberOfSegments += me0Segments->size();
+    totalNumberOfHits += me0RecHits->size();
+  }
+
+  if (totalNumberOfSegments + totalNumberOfHits < 1)
+    return;
 
   ///// get a set of DetId's in a given direction
 

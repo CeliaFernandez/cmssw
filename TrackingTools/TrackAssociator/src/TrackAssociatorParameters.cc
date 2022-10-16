@@ -48,6 +48,9 @@ void TrackAssociatorParameters::loadParameters(const edm::ParameterSet& iConfig,
   theCSCSegmentCollectionLabel = iConfig.getParameter<edm::InputTag>("CSCSegmentCollectionLabel");
   theGEMSegmentCollectionLabel = iConfig.getParameter<edm::InputTag>("GEMSegmentCollectionLabel");
   theME0SegmentCollectionLabel = iConfig.getParameter<edm::InputTag>("ME0SegmentCollectionLabel");
+  theRPCHitCollectionLabel = iConfig.getParameter<edm::InputTag>("RPCHitCollectionLabel");
+  theGEMHitCollectionLabel = iConfig.getParameter<edm::InputTag>("GEMHitCollectionLabel");
+  theME0HitCollectionLabel = iConfig.getParameter<edm::InputTag>("ME0HitCollectionLabel");
 
   accountForTrajectoryChangeCalo = iConfig.getParameter<bool>("accountForTrajectoryChangeCalo");
   // accountForTrajectoryChangeMuon   = iConfig.getParameter<bool>("accountForTrajectoryChangeMuon");
@@ -68,10 +71,15 @@ void TrackAssociatorParameters::loadParameters(const edm::ParameterSet& iConfig,
   if (useMuon) {
     dtSegmentsToken = iC.consumes<DTRecSegment4DCollection>(theDTRecSegment4DCollectionLabel);
     cscSegmentsToken = iC.consumes<CSCSegmentCollection>(theCSCSegmentCollectionLabel);
-    if (useGEM)
+    rpcHitsToken = iC.consumes<RPCRecHitCollection>(theRPCHitCollectionLabel);
+    if (useGEM) {
       gemSegmentsToken = iC.consumes<GEMSegmentCollection>(theGEMSegmentCollectionLabel);
-    if (useME0)
+      gemHitsToken = iC.consumes<GEMRecHitCollection>(theGEMHitCollectionLabel);
+    }
+    if (useME0){
       me0SegmentsToken = iC.consumes<ME0SegmentCollection>(theME0SegmentCollectionLabel);
+      me0HitsToken = iC.consumes<ME0RecHitCollection>(theME0HitCollectionLabel);
+    }
   }
   if (truthMatch) {
     simTracksToken = iC.consumes<edm::SimTrackContainer>(edm::InputTag("g4SimHits"));

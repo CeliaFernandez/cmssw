@@ -39,6 +39,9 @@ TrackAssociatorParameterBlock = cms.PSet(
 	dRPreshowerPreselection = cms.double(0.2),
         truthMatch = cms.bool(False),
         HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+        RPCHitCollectionLabel = cms.InputTag("rpcRecHits"),
+        GEMHitCollectionLabel = cms.InputTag("gemRecHits"),
+        ME0HitCollectionLabel = cms.InputTag("me0RecHits"),
         useHcal = cms.bool(True)
     )
 )
@@ -73,5 +76,8 @@ TrackAssociatorParameters = cms.PSet(
     EBRecHitCollectionLabel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
     truthMatch = cms.bool(False),
     HBHERecHitCollectionLabel = cms.InputTag("hbhereco"),
+    RPCHitCollectionLabel = cms.InputTag("rpcRecHits"),
+    GEMHitCollectionLabel = cms.InputTag("gemRecHits"),
+    ME0HitCollectionLabel = cms.InputTag("me0RecHits"),
     useHcal = cms.bool(True)
 )
