@@ -592,7 +592,8 @@ DetIdAssociator::MapRange TrackDetectorAssociator::getMapRange(const std::pair<f
 }
 
 void TrackDetectorAssociator::getTAMuonChamberMatches(std::vector<TAMuonChamberMatch>& matches,
-                                                      const AssociatorParameters& parameters) {
+                                                      const AssociatorParameters& parameters,
+                                                      std::set<DetId> occupancy) {
   // Strategy:
   //    Propagate through the whole detector, estimate change in eta and phi
   //    along the trajectory, add this to dRMuon and find DetIds around this
@@ -615,15 +616,20 @@ void TrackDetectorAssociator::getTAMuonChamberMatches(std::vector<TAMuonChamberM
   LogTrace("TrackAssociator") << "muon direction: " << direction
                               << "\n\t and corresponding point: " << trajectoryPoint.position() << "\n";
 
-  DetIdAssociator::MapRange mapRange =
-      getMapRange(cachedTrajectory_.trajectoryDelta(CachedTrajectory::FullTrajectory), parameters.dRMuonPreselection);
+  //DetIdAssociator::MapRange mapRange =
+  //    getMapRange(cachedTrajectory_.trajectoryDelta(CachedTrajectory::FullTrajectory), parameters.dRMuonPreselection);
+  //std::cout << "dRMuonPreselection: " << parameters.dRMuonPreselection << std::endl;
 
   // and find chamber DetIds
 
-  std::set<DetId> muonIdsInRegion = muonDetIdAssociator_->getDetIdsCloseToAPoint(trajectoryPoint.position(), mapRange);
-  LogTrace("TrackAssociator") << "Number of chambers to check: " << muonIdsInRegion.size();
+  //std::set<DetId> muonIdsInRegion = muonDetIdAssociator_->getDetIdsCloseToAPoint(trajectoryPoint.position(), mapRange);
+  //LogTrace("TrackAssociator") << "Number of chambers to check: " << muonIdsInRegion.size();
+  //std::cout << "Chambers to check: " << muonIdsInRegion.size() << std::endl;
+  std::set<DetId> muonIdsInRegion = occupancy;
+  std::cout << "Chambers to check: " << muonIdsInRegion.size() << std::endl;
   for (std::set<DetId>::const_iterator detId = muonIdsInRegion.begin(); detId != muonIdsInRegion.end(); detId++) {
     const GeomDet* geomDet = muonDetIdAssociator_->getGeomDet(*detId);
+    std::cout << "Subdetector: " << geomDet->subDetector() << std::endl;
     TrajectoryStateOnSurface stateOnSurface = cachedTrajectory_.propagate(&geomDet->surface());
     if (!stateOnSurface.isValid()) {
       LogTrace("TrackAssociator") << "Failed to propagate the track; moving on\n\t"
@@ -746,8 +752,41 @@ void TrackDetectorAssociator::fillMuon(const edm::Event& iEvent,
     totalNumberOfHits += me0RecHits->size();
   }
 
-  if (totalNumberOfSegments + totalNumberOfHits < 1)
+  if (totalNumberOfSegments + totalNumberOfHits < 1) {
+    LogTrace("TrackAssociator") << "No segments or hits were found in the event: aborting track extrapolation" << std::endl;
     return;
+  }
+
+  ///// Get the chambers with segments/hits in the events
+  std::set<DetId> occupancy_set;
+  for (const auto& dtSegment : *dtSegments) {
+    occupancy_set.insert(dtSegment.geographicalId());
+  }
+  for (const auto& cscSegment : *cscSegments) {
+    occupancy_set.insert(cscSegment.geographicalId());
+  }
+  for (const auto& rpcRecHit : *rpcRecHits) {
+    occupancy_set.insert(rpcRecHit.geographicalId());
+  }
+  if (parameters.useGEM) {
+    for (const auto& gemSegment : *gemSegments) {
+      occupancy_set.insert(gemSegment.geographicalId());
+    }
+    for (const auto& gemRecHit : *gemRecHits) {
+      occupancy_set.insert(gemRecHit.geographicalId());
+    }
+  }
+  if (parameters.useME0) {
+    for (const auto& me0Segment : *me0Segments) {
+      occupancy_set.insert(me0Segment.geographicalId());
+    }
+    for (const auto& me0RecHit : *me0RecHits) {
+      occupancy_set.insert(me0RecHit.geographicalId());
+    }
+  }
+
+  //std::cout << "Number of geographical ids: " << occupancy_set.size() << std::endl;
+
 
   ///// get a set of DetId's in a given direction
 
@@ -762,8 +801,9 @@ void TrackDetectorAssociator::fillMuon(const edm::Event& iEvent,
   // get a set of matches corresponding to muon chambers
   std::vector<TAMuonChamberMatch> matchedChambers;
   LogTrace("TrackAssociator") << "Trying to Get ChamberMatches" << std::endl;
-  getTAMuonChamberMatches(matchedChambers, parameters);
+  getTAMuonChamberMatches(matchedChambers, parameters, occupancy_set);
   LogTrace("TrackAssociator") << "Chambers matched: " << matchedChambers.size() << "\n";
+  std::cout << "Matched chambers: " << matchedChambers.size() << std::endl;
 
   // Iterate over all chamber matches and fill segment matching
   // info if it's available

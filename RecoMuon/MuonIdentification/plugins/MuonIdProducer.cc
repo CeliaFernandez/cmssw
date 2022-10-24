@@ -837,6 +837,8 @@ void MuonIdProducer::fillMuonId(edm::Event& iEvent,
     throw cms::Exception("FatalError")
         << "Failed to fill muon id information for a muon with undefined references to tracks";
 
+  std::cout << "Track pt: " << track->pt() << std::endl;
+  std::cout << "Track eta: " << track->eta() << std::endl;
   TrackDetMatchInfo info = trackAssociator_.associate(iEvent, iSetup, *track, parameters_, direction);
 
   LogTrace("MuonIdentification") << "RecoMuon/MuonIdProducer :: fillMuonId :: fillEnergy = " << fillEnergy_;
