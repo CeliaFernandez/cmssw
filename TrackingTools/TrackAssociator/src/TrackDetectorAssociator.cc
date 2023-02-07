@@ -616,9 +616,25 @@ void TrackDetectorAssociator::getTAMuonChamberMatches(std::vector<TAMuonChamberM
   LogTrace("TrackAssociator") << "muon direction: " << direction
                               << "\n\t and corresponding point: " << trajectoryPoint.position() << "\n";
 
+  DetIdAssociator::MapRange mapRange =
+      getMapRange(cachedTrajectory_.trajectoryDelta(CachedTrajectory::FullTrajectory), parameters.dRMuonPreselection);
+
   // and find chamber DetIds
 
-  std::set<DetId> muonIdsInRegion = occupancy;
+  std::set<DetId> muonIdsInRegion = muonDetIdAssociator_->getDetIdsCloseToAPoint(trajectoryPoint.position(), mapRange);
+  LogTrace("TrackAssociator") << "Number of chambers to check: " << muonIdsInRegion.size();
+
+  std::set<DetId> muonIdsInRegionOccupied;
+  std::set_intersection(muonIdsInRegion.begin(), muonIdsInRegion.end(), occupancy.begin(), occupancy.end(), std::inserter(muonIdsInRegionOccupied, muonIdsInRegionOccupied.begin()));
+
+  std::cout << "Number of chambers with occupancy: " << occupancy.size() << std::endl;
+  std::cout << "Number of chambers to check: " << muonIdsInRegion.size() << std::endl;
+  std::cout << "Number of chambers in common: " << muonIdsInRegionOccupied.size() << std::endl; 
+
+  /*
+  if (muonIdsInRegionOccupied.size() < 1)
+    return;
+  */
 
   for (std::set<DetId>::const_iterator detId = muonIdsInRegion.begin(); detId != muonIdsInRegion.end(); detId++) {
     const GeomDet* geomDet = muonDetIdAssociator_->getGeomDet(*detId);
@@ -758,11 +774,12 @@ void TrackDetectorAssociator::fillMuon(const edm::Event& iEvent,
     }
   }
 
+  /*
   if (occupancy_set.size() < 1) {
     LogTrace("TrackAssociator") << "No segments or hits were found in the event: aborting track extrapolation" << std::endl;
     return;
   }
-
+  */
 
   ///// get a set of DetId's in a given direction
 
