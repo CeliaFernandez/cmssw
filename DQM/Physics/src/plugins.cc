@@ -18,6 +18,7 @@
 #include "DQM/Physics/src/QcdUeDQM.h"
 #include "DQM/Physics/src/HiggsDQM.h"
 #include "DQM/Physics/src/ExoticaDQM.h"
+#include "DQM/Physics/src/ExoticaDQM_miniAOD.h"
 #include "DQM/Physics/src/B2GDQM.h"
 #include "DQM/Physics/src/CentralityDQM.h"
 #include "DQM/Physics/src/CentralitypADQM.h"
@@ -41,6 +42,7 @@ DEFINE_FWK_MODULE(RecoSusyDQM);
 DEFINE_FWK_MODULE(QcdUeDQM);
 DEFINE_FWK_MODULE(HiggsDQM);
 DEFINE_FWK_MODULE(ExoticaDQM);
+DEFINE_FWK_MODULE(ExoticaDQM_miniAOD);
 DEFINE_FWK_MODULE(B2GDQM);
 DEFINE_FWK_MODULE(CentralityDQM);
 DEFINE_FWK_MODULE(CentralitypADQM);
