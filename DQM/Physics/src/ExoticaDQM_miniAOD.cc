@@ -3,7 +3,6 @@
 using namespace edm;
 using namespace std;
 using namespace reco;
-using namespace trigger;
 
 typedef vector<string> vstring;
 
@@ -17,9 +16,6 @@ ExoticaDQM_miniAOD::ExoticaDQM_miniAOD(const edm::ParameterSet& ps) {
   typedef std::vector<edm::InputTag> vtag;
 
   // Get parameters from configuration file
-  // Trigger
-  TriggerToken_ = consumes<TriggerResults>(ps.getParameter<edm::InputTag>("TriggerResults"));
-  HltPaths_  = ps.getParameter<vector<string> >("HltPaths");
   // Vertices
   VertexToken_ = consumes<reco::VertexCollection>(ps.getParameter<InputTag>("vertexCollection"));
   // Electrons
@@ -50,6 +46,7 @@ ExoticaDQM_miniAOD::ExoticaDQM_miniAOD(const edm::ParameterSet& ps) {
   TrackToken_ = consumes<std::vector<pat::IsolatedTrack> >(ps.getParameter<InputTag>("trackCollection"));
   // Displaced collections
   MuonDispSAToken_ = consumes<reco::TrackCollection>(ps.getParameter<InputTag>("displacedSAMuonCollection"));
+  MuonDispGLToken_ = consumes<reco::TrackCollection>(ps.getParameter<InputTag>("displacedGLMuonCollection"));
   // MC Truth
   GenParticleToken_ = consumes<reco::GenParticleCollection>(ps.getParameter<InputTag>("genParticleCollection"));
   //
@@ -231,6 +228,11 @@ void ExoticaDQM_miniAOD::bookHistograms(DQMStore::IBooker& bei, edm::Run const&,
 
   //--- Displaced Leptons (filled using only leptons from long-lived stop decay).
   bei.setCurrentFolder("Physics/Exotica_miniAOD/DisplacedFermions");
+  dispFerm_isotrack_dxy = bei.book1D("dispFerm_isotrack_dxy", "Isotrack |d_{xy}| (cm);Isotrack |d_{xy}| (cm); Counts", 20, 0.0, 20.0);
+  dispFerm_electron_dxy = bei.book1D("dispFerm_electron_dxy", "Electron |d_{xy}| (cm);Electron |d_{xy}| (cm); Counts", 20, 0.0, 20.0);
+  dispFerm_muon_dxy = bei.book1D("dispFerm_muon_dxy", "Muon |d_{xy}| (cm);Muon |d_{xy}| (cm); Counts", 20, 0.0, 30.0);
+  dispFerm_dsa_dxy = bei.book1D("dispFerm_dsa_dxy", "DSA |d_{xy}| (cm);DSA |d_{xy}| (cm); Counts", 20, 0.0, 300.0);
+  dispFerm_dgl_dxy = bei.book1D("dispFerm_dgl_dxy", "DGL |d_{xy}| (cm);DGL |d_{xy}| (cm); Counts", 30, 0.0, 50.0);
   dispElec_track_effi_lxy = bei.bookProfile("dispElec_track_effi_lxy",
                                             "Electron channel; Transverse decay length (cm); Track reco efficiency",
                                             10,
@@ -300,12 +302,6 @@ void ExoticaDQM_miniAOD::bookHistograms(DQMStore::IBooker& bei, edm::Run const&,
 void ExoticaDQM_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // objects
 
-  //Trigger
-  bool ValidTriggers = iEvent.getByToken(TriggerToken_, TriggerResults_);
-  if (!ValidTriggers) {
-    return;
-  }
-
   // Vertices
   bool ValidVertices = iEvent.getByToken(VertexToken_, VertexCollection_);
   if (!ValidVertices) {
@@ -342,27 +338,10 @@ void ExoticaDQM_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup
 
   // Special collections for displaced particles
   bool ValidDSA = iEvent.getByToken(MuonDispSAToken_, MuonDispSACollection_);
+  bool ValidDGL = iEvent.getByToken(MuonDispGLToken_, MuonDispGLCollection_);
 
   // MC truth
   bool ValidGenParticles = iEvent.getByToken(GenParticleToken_, GenCollection_);
-
-  // ---> Trigger
-
-  int N_Triggers = TriggerResults_->size();
-  int N_GoodTriggerPaths = HltPaths_.size();
-  bool triggered_event = false;
-  const edm::TriggerNames& trigName = iEvent.triggerNames(*TriggerResults_);
-  for (int i_Trig = 0; i_Trig < N_Triggers; ++i_Trig) {
-    if (TriggerResults_.product()->accept(i_Trig)) {
-      for (int n = 0; n < N_GoodTriggerPaths; n++) {
-        if (trigName.triggerName(i_Trig).find(HltPaths_[n]) != std::string::npos) {
-          triggered_event = true;
-        }
-      }
-    }
-  }
-  if (triggered_event == false)
-    return;
 
   // ---> Variable initialisation
   for (int i = 0; i < 2; i++) {
@@ -576,7 +555,7 @@ void ExoticaDQM_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup
   analyzeMonoElectrons(iEvent);
 
   //LongLived
-  if (ValidGenParticles && ValidTracks && ValidDSA) {
+  if (ValidGenParticles && ValidTracks && ValidDSA && ValidDGL) {
     analyzeDisplacedLeptons(iEvent, iSetup);
     analyzeDisplacedJets(iEvent, iSetup);
   }
@@ -587,7 +566,34 @@ void ExoticaDQM_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup
 void ExoticaDQM_miniAOD::analyzeDisplacedLeptons(const Event& iEvent, const edm::EventSetup& iSetup) {
   //=== This is designed to run on MC events in which a pair of long-lived stop quarks each decay to a displaced lepton + displaced b jet.
 
-  // Initialisation
+  // Check impact parameters profiles
+  for (const pat::IsolatedTrack& trk : *TrackCollection_) {
+    if (trk.pt() < 1.0)
+      continue;
+    dispFerm_isotrack_dxy->Fill(std::abs(trk.dxy()));
+  }
+  for (const pat::Electron& ele : *ElectronCollection_) {
+    if (ele.pt() < 1.5)
+      continue;
+    dispFerm_electron_dxy->Fill(ele.dB());
+  } 
+  for (const pat::Muon& muon : *MuonCollection_) {
+    if (muon.pt() < 1.5)
+      continue;
+    dispFerm_muon_dxy->Fill(std::abs(muon.dB()));
+  }
+  for (const reco::Track& dsa : *MuonDispSACollection_) {
+    if (dsa.pt() < 1.5)
+      continue;
+    dispFerm_dsa_dxy->Fill(std::abs(dsa.dxy()));
+  }
+  for (const reco::Track& dgl : *MuonDispGLCollection_) {
+    if (dgl.pt() < 1.5)
+      continue;
+    dispFerm_dgl_dxy->Fill(std::abs(dgl.dxy()));
+  }
+
+  // Initialisation for MC-Truth comparison
 
   const unsigned int stop1 = 1000006;  // PDG identifier of top squark1
   const unsigned int stop2 = 2000006;  // PDG identifier of top squark2

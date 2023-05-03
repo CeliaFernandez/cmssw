@@ -4,10 +4,6 @@ from DQMServices.Core.DQMEDAnalyzer import DQMEDAnalyzer
 ExoticaDQM_miniAOD = DQMEDAnalyzer(
     "ExoticaDQM_miniAOD",
 
-    #Trigger Results
-    TriggerResults           = cms.InputTag('TriggerResults','','HLT'),
-    HltPaths                 = cms.vstring("HLT_Mu","HLT_Ele","HLT_Photon","HLT_PFHT","HLT_HT","HLT_PFMET","HLT_MET","HLT_"),
-
     #Physics objects
     vertexCollection         = cms.InputTag('offlineSlimmedPrimaryVertices'),
     electronCollection       = cms.InputTag("slimmedElectrons"),
@@ -25,6 +21,7 @@ ExoticaDQM_miniAOD = DQMEDAnalyzer(
     trackCollection          = cms.InputTag("isolatedTracks"),
 
     displacedSAMuonCollection  = cms.InputTag("displacedStandAloneMuons"),
+    displacedGLMuonCollection  = cms.InputTag("displacedGlobalMuons"),
 
     # MC truth
     genParticleCollection    = cms.InputTag("prunedGenParticles"),

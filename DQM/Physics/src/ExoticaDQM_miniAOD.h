@@ -22,11 +22,6 @@
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-// Trigger
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-#include "FWCore/Common/interface/TriggerNames.h"
-
 // Candidate handling
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -136,13 +131,6 @@ private:
   int nLumiSecs_;
   int nEvents_, irun, ievt;
 
-  bool isValidHltConfig_;
-
-  //Trigger
-  std::vector<std::string> HltPaths_;
-  edm::EDGetTokenT<edm::TriggerResults> TriggerToken_;
-  edm::Handle<edm::TriggerResults> TriggerResults_;
-
   //Vertex
   edm::EDGetTokenT<reco::VertexCollection> VertexToken_;
   edm::Handle<reco::VertexCollection> VertexCollection_;
@@ -182,6 +170,8 @@ private:
   // Special collections for highly displaced particles
   edm::EDGetTokenT<reco::TrackCollection> MuonDispSAToken_;
   edm::Handle<reco::TrackCollection> MuonDispSACollection_;
+  edm::EDGetTokenT<reco::TrackCollection> MuonDispGLToken_;
+  edm::Handle<reco::TrackCollection> MuonDispGLCollection_;
 
   // MC truth
   edm::EDGetTokenT<reco::GenParticleCollection> GenParticleToken_;
@@ -394,6 +384,11 @@ private:
   ///////////////////////////////////
   // Histograms - Displaced Leptons or Jets
   //
+  MonitorElement* dispFerm_isotrack_dxy;
+  MonitorElement* dispFerm_electron_dxy;
+  MonitorElement* dispFerm_muon_dxy;
+  MonitorElement* dispFerm_dsa_dxy;
+  MonitorElement* dispFerm_dgl_dxy;
   MonitorElement* dispElec_track_effi_lxy;
   MonitorElement* dispElec_elec_effi_lxy;
   MonitorElement* dispMuon_track_effi_lxy;
