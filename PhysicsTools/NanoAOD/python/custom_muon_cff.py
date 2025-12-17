@@ -285,6 +285,12 @@ def AddVariablesForMuon(proc):
     
     return proc
 
+def ModifyMuonSelection(process):
+
+    process.finalMuons.cut = cms.string("pt > 2")
+
+    return process
+
 def AddTriggerObjectBits(process): 
     process.triggerObjectTable.selections.Muon_POG = cms.PSet(
             id = cms.int32(1313),
@@ -372,6 +378,7 @@ def PrepMuonCustomNanoAOD(process):
     process = AddVariablesForMuon(process)
     process = AddTriggerObjectBits(process)
     process = IncreaseGenPrecesion(process)
+    process = ModifyMuonSelection(process)
 
 
     return process
