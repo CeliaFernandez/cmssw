@@ -36,6 +36,7 @@ MuonIdProducer::MuonIdProducer(const edm::ParameterSet& iConfig)
       propagatorToken_(esConsumes(edm::ESInputTag("", "SteppingHelixPropagatorAny"))) {
   LogTrace("MuonIdentification") << "RecoMuon/MuonIdProducer :: Constructor called";
 
+  // Dummy comment
   produces<reco::MuonCollection>();
   produces<reco::CaloMuonCollection>();
   produces<reco::MuonTimeExtraMap>("combined");
