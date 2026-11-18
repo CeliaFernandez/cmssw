@@ -44,7 +44,7 @@ void pfTracksProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<std::vector<pat::PackedCandidate>> lostTracks;
   iEvent.getByToken(LostTracks_, lostTracks);
 
-  std::unique_ptr<std::vector<reco::Track>> tracks(new std::vector<reco::Track>());
+  std::unique_ptr<std::vector<reco::Track>> tracks = std::make_unique<std::vector<reco::Track>>();
   tracks->reserve(pfcands->size() + lostTracks->size());
 
   for (const auto& container : {pfcands, lostTracks}) {
